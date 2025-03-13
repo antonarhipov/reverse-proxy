@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # Reverse proxy service
+  reverse-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - BACKEND1_URL=http://backend1:8080
+      - BACKEND2_URL=http://backend2:8080
+      - BACKEND3_URL=http://backend3:8080
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+    networks:
+      - reverse-proxy-network
+
+  # Backend services
+  backend1:
+    image: jmalloc/echo-server
+    ports:
+      - "8081:8080"
+    environment:
+      - PORT=8080
+    networks:
+      - reverse-proxy-network
+
+  backend2:
+    image: jmalloc/echo-server
+    ports:
+      - "8082:8080"
+    environment:
+      - PORT=8080
+    networks:
+      - reverse-proxy-network
+
+  backend3:
+    image: jmalloc/echo-server
+    ports:
+      - "8083:8080"
+    environment:
+      - PORT=8080
+    networks:
+      - reverse-proxy-network
+
+networks:
+  reverse-proxy-network:
+    driver: bridge

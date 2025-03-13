@@ -1,12 +1,48 @@
 <configuration>
+    <!-- Console appender with text format for local development -->
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
+
+    <!-- JSON appender for structured logging -->
+    <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdcKeyName>correlationId</includeMdcKeyName>
+            <includeMdcKeyName>requestId</includeMdcKeyName>
+            <includeMdcKeyName>clientIp</includeMdcKeyName>
+            <includeMdcKeyName>method</includeMdcKeyName>
+            <includeMdcKeyName>path</includeMdcKeyName>
+            <includeMdcKeyName>statusCode</includeMdcKeyName>
+            <includeMdcKeyName>responseTime</includeMdcKeyName>
+        </encoder>
+    </appender>
+
+    <!-- File appender for persistent logging -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/reverse-proxy.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/reverse-proxy.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <!-- Root logger configuration -->
     <root level="INFO">
-        <appender-ref ref="STDOUT"/>
+        <!-- Use JSON appender for production, STDOUT for development -->
+        <appender-ref ref="JSON"/>
+        <!-- <appender-ref ref="STDOUT"/> -->
+        <appender-ref ref="FILE"/>
     </root>
+
+    <!-- Third-party loggers -->
     <logger name="org.eclipse.jetty" level="INFO"/>
     <logger name="io.netty" level="INFO"/>
+
+    <!-- Application loggers -->
+    <logger name="com.example" level="DEBUG"/>
+    <logger name="com.example.reverseproxy.security" level="DEBUG"/>
+    <logger name="com.example.reverseproxy.circuitbreaker" level="DEBUG"/>
 </configuration>

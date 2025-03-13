@@ -9,15 +9,15 @@ reverseProxy:
   # Backend server configuration
   backends:
     - id: "backend1"
-      url: "http://localhost:8081"
+      url: ${BACKEND1_URL:-http://localhost:8081}
       weight: 3
       healthCheckPath: "/health"
     - id: "backend2"
-      url: "http://localhost:8082"
+      url: ${BACKEND2_URL:-http://localhost:8082}
       weight: 2
       healthCheckPath: "/health"
     - id: "backend3"
-      url: "http://localhost:8083"
+      url: ${BACKEND3_URL:-http://localhost:8083}
       weight: 1
       healthCheckPath: "/health"
 
